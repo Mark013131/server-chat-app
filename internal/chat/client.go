@@ -8,6 +8,7 @@ type Client struct {
 	hub  *Hub
 	conn *websocket.Conn
 	send chan []byte
+	ID  string
 }
 
 func (c *Client) ReadPump() {
