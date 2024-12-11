@@ -9,24 +9,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-	
 		return true
 	},
 }
 
-
 type Hub struct {
-	clients    map[string]*Client 
+	clients    map[string]*Client
 	broadcast  chan []byte
 	register   chan *Client
 	unregister chan *Client
 }
-
 
 func NewHub() *Hub {
 	return &Hub{
@@ -37,17 +33,16 @@ func NewHub() *Hub {
 	}
 }
 
-
 func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client.ID] = client 
+			h.clients[client.ID] = client
 			log.Printf("Client registered: %s", client.ID)
 
 		case client := <-h.unregister:
 			if _, ok := h.clients[client.ID]; ok {
-				delete(h.clients, client.ID) 
+				delete(h.clients, client.ID)
 				close(client.send)
 				log.Printf("Client unregistered: %s", client.ID)
 			}
@@ -67,9 +62,7 @@ func (h *Hub) Run() {
 	}
 }
 
-
 func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
@@ -78,14 +71,14 @@ func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		id = uuid.New().String() 
+		id = uuid.New().String()
 	}
 
 	client := &Client{
 		hub:  h,
 		conn: conn,
 		send: make(chan []byte, 256),
-		ID:   id, 
+		ID:   id,
 	}
 	h.register <- client
 
