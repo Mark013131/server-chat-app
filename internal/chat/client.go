@@ -1,6 +1,8 @@
 package chat
 
 import (
+	"encoding/json"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -17,11 +19,22 @@ func (c *Client) ReadPump() {
 		c.conn.Close()
 	}()
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, rawMessage, err := c.conn.ReadMessage()
 		if err != nil {
 			break
 		}
-		c.hub.broadcast <- message
+
+		message := Message{
+			Sender:  c.ID,              
+			Content: string(rawMessage), 
+		}
+
+		encodedMessage, err := json.Marshal(message)
+		if err != nil {
+			continue
+		}
+
+		c.hub.broadcast <- encodedMessage
 	}
 }
 
