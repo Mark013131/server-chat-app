@@ -46,7 +46,6 @@ func (c *Client) ReadPump() {
 			}
 			c.ID = id
 			log.Printf("My ID is: %s", c.ID)
-
 			continue
 		} else if messageType == "MESSAGE" {
 			sender, ok := message["sender"].(string)
@@ -61,6 +60,7 @@ func (c *Client) ReadPump() {
 			}
 			log.Printf("Received message from %s: %s", sender, content)
 
+			// 受け取ったメッセージを全クライアントに送信
 			encodedMessage, err := json.Marshal(message)
 			if err != nil {
 				log.Printf("Error marshaling message: %v", err)
