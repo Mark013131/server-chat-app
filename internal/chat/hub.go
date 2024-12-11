@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -87,6 +88,13 @@ func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		ID:   id, 
 	}
 	h.register <- client
+
+	connectMessage := map[string]string{
+		"type": "CONNECT",
+		"id":   id,
+	}
+	connectMessageBytes, _ := json.Marshal(connectMessage)
+	client.send <- connectMessageBytes
 
 	go client.ReadPump()
 	go client.WritePump()
