@@ -48,19 +48,15 @@ func (c *Client) ReadPump() {
 			log.Printf("My ID is: %s", c.ID)
 			continue
 		} else if messageType == "MESSAGE" {
-			sender, ok := message["sender"].(string)
-			if !ok {
-				log.Printf("Error: Sender is not a string or missing")
-				continue
-			}
 			content, ok := message["content"].(string)
 			if !ok {
 				log.Printf("Error: Content is not a string or missing")
 				continue
 			}
-			log.Printf("Received message from %s: %s", sender, content)
+			log.Printf("Received message: %s", content)
 
-			// 受け取ったメッセージを全クライアントに送信
+			message["sender"] = c.ID
+
 			encodedMessage, err := json.Marshal(message)
 			if err != nil {
 				log.Printf("Error marshaling message: %v", err)
